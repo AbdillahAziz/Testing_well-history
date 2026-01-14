@@ -21,6 +21,8 @@ st.sidebar.image(gambar)
 st.sidebar.title("Pengaturan")
 st.sidebar.subheader("Pengaturan konfigurasi tampilan")
 
+#Test
+
 #>>>>>>>>>>>> Load Data <<<<<<<<<<<<#
 # Load Excel
 folder_path = 'Data/Well History'
