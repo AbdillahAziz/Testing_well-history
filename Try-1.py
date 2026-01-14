@@ -10,7 +10,7 @@ import os
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
 st.title("Well History Data Compilation")
-st.image('Logo PGE Panjang.png', width=200)
+st.image('Logo PGE Panjang.jpg', width=200)
 st.write("""This page contain the compilation of well history data from various wells in the area. You can filter the data based on Area, Cluster, and Well Name using the sidebar options.""")
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 
@@ -76,3 +76,4 @@ filtered_df = final_df[
 
 #>>>>>>>>>>>> Showing Data <<<<<<<<<<<<#
 st.dataframe(filtered_df)
+
