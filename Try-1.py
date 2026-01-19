@@ -25,7 +25,7 @@ st.sidebar.subheader("Pengaturan konfigurasi tampilan")
 
 #>>>>>>>>>>>> Load Data <<<<<<<<<<<<#
 # Load Excel
-folder_path = 'Data/Well History'
+folder_path = 'data/Well History'
 
 df_list = []
 
