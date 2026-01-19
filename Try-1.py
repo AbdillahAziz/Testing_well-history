@@ -6,37 +6,54 @@ from matplotlib import cm
 import streamlit as st
 from PIL import Image
 import os
+from io import BytesIO
 
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
 
 st.markdown("""
 <style>
-/* Download button animation */
+
+/* ===== PGE BRAND THEME ===== */
+:root {
+    --pge-green: #006A4E;
+    --pge-green-dark: #004D3A;
+    --pge-accent: #A5D6A7;
+}
+
+/* Download buttons */
 div.stDownloadButton > button {
-    background-color: #2E7D32;
+    background-color: var(--pge-green);
     color: white;
     padding: 0.6em 1.4em;
-    border-radius: 10px;
+    border-radius: 12px;
     font-weight: 600;
     border: none;
-    animation: pulse 2s infinite;
+    animation: pulse 2.2s infinite;
     transition: transform 0.2s ease-in-out;
 }
 
-/* Hover effect */
 div.stDownloadButton > button:hover {
-    background-color: #1B5E20;
+    background-color: var(--pge-green-dark);
     transform: scale(1.05);
     animation: none;
 }
 
+/* Disabled state */
+div.stDownloadButton > button:disabled {
+    background-color: #BDBDBD;
+    color: #EEEEEE;
+    animation: none;
+    cursor: not-allowed;
+}
+
 /* Pulse animation */
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.6); }
-    70% { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(0, 106, 78, 0.6); }
+    70% { box-shadow: 0 0 0 12px rgba(0, 106, 78, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 106, 78, 0); }
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -59,6 +76,7 @@ st.sidebar.subheader("Pengaturan konfigurasi tampilan")
 # Load Excel
 folder_path = 'data/Well History'
 
+@st.cache_data
 def load_data(folder_path):
     df_list = []
 
@@ -119,30 +137,58 @@ filtered_df = filtered_df.drop(columns=['Date_dt'])
 st.dataframe(filtered_df)
 
 # Option to download the filtered data as Excel
+@st.cache_data
 def convert_df_to_excel(df):
-    from io import BytesIO
     output = BytesIO()
     with pd.ExcelWriter(output) as writer:
         df.to_excel(writer, index=False, sheet_name='Filtered Data')
-        
-    processed_data = output.getvalue()
-    return processed_data
+    return output.getvalue()
 
-excel_data = convert_df_to_excel(filtered_df)
+@st.cache_data
+def convert_df_to_csv(df):
+    return df.to_csv(index=False).encode('utf-8')
 
-st.markdown("### 📤 Export Filtered Well History Data")
+#>>>>>>>>>>>> Export Data  & Download Button <<<<<<<<<<<<#
+st.markdown("## 📤 Export Data")
 
-clicked = st.download_button(
-    label="📥 Download Excel",
-    data=excel_data,
-    file_name="filtered_well_history_data.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+if filtered_df.empty:
+    st.warning("⚠️ No data available with the current filter selection.")
+else:
+    st.caption(
+        f"📄 {len(filtered_df)} rows | "
+        f"🕒 Generated {pd.Timestamp.now().strftime('%d %B %Y %H:%M')}"
+    )
 
-if clicked:
-    st.success("✅ Download started successfully!")
+    col1, col2 = st.columns(2)
 
-st.caption(
-    f"📄 {len(filtered_df)} rows exported | "
-    f"🕒 Generated on {pd.Timestamp.now().strftime('%d %B %Y %H:%M')}"
-)
+    # ===== EXCEL EXPORT =====
+    with col1:
+        with st.spinner("Preparing Excel file..."):
+            excel_data = convert_df_to_excel(filtered_df)
+
+        excel_clicked = st.download_button(
+            label="📥 Download Excel",
+            data=excel_data,
+            file_name="filtered_well_history_data.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            disabled=filtered_df.empty
+        )
+
+        if excel_clicked:
+            st.toast("✅ Excel download started", icon="📊")
+
+    # ===== CSV EXPORT =====
+    with col2:
+        with st.spinner("Preparing CSV file..."):
+            csv_data = convert_df_to_csv(filtered_df)
+
+        csv_clicked = st.download_button(
+            label="📥 Download CSV",
+            data=csv_data,
+            file_name="filtered_well_history_data.csv",
+            mime="text/csv",
+            disabled=filtered_df.empty
+        )
+
+        if csv_clicked:
+            st.toast("✅ CSV download started", icon="📄")
