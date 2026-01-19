@@ -11,14 +11,14 @@ import xlsxwriter
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
 st.title("Well History Data Compilation")
-# Logo PGE Panjang di tengah halaman
-st.image('Logo PGE Panjang 1.jpg')
+if os.path.exists('Logo PGE Panjang 1.jpg'):
+    st.image('Logo PGE Panjang 1.jpg')
 st.write("""This page contain the compilation of well history data from various wells in the area. You can filter the data based on Area, Cluster, and Well Name using the sidebar options.""")
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 
 #>>>>>>>>>>>> sidebar <<<<<<<<<<<<#
-gambar = Image.open('Logo PGE.png')
-st.sidebar.image(gambar)
+if os.path.exists('Logo PGE.png'):
+    st.sidebar.image(Image.open('Logo PGE.png'))
 
 st.sidebar.title("Pengaturan")
 st.sidebar.subheader("Pengaturan konfigurasi tampilan")
@@ -29,41 +29,44 @@ st.sidebar.subheader("Pengaturan konfigurasi tampilan")
 # Load Excel
 folder_path = 'data/Well History'
 
-df_list = []
+def load_data(folder_path):
+    df_list = []
 
-for file_name in os.listdir(folder_path):
-    if file_name.endswith('.xlsx'):
-        file_path = os.path.join(folder_path, file_name)
-        df_raw = pd.read_excel(file_path, header=None)
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith('.xlsx'):
+            file_path = os.path.join(folder_path, file_name)
+            df_raw = pd.read_excel(file_path, header=None)
 
-        well_name = df_raw.iloc[0, 1]
-        cluster = df_raw.iloc[1, 1]
-        unit = df_raw.iloc[2, 1]
-        area = df_raw.iloc[3, 1]
+            well_name = df_raw.iloc[0, 1]
+            cluster = df_raw.iloc[1, 1]
+            unit = df_raw.iloc[2, 1]
+            area = df_raw.iloc[3, 1]
 
-        df = df_raw.iloc[6:].reset_index(drop=True)
-        df.columns = df.iloc[0]
-        df = df[1:].reset_index(drop=True)
+            df = df_raw.iloc[6:].reset_index(drop=True)
+            df.columns = df.iloc[0]
+            df = df[1:].reset_index(drop=True)
 
-        df["Well Name"] = well_name
-        df["Cluster"] = cluster
-        df["Unit"] = unit
-        df["Area"] = area
+            df["Well Name"] = well_name
+            df["Cluster"] = cluster
+            df["Unit"] = unit
+            df["Area"] = area
 
-        df = df[['Well Name', 'Cluster', 'Unit', 'Area','Date','Type','Remarks']]
+            df = df[['Well Name', 'Cluster', 'Unit', 'Area', 'Date', 'Type', 'Remarks']]
+            df_list.append(df)
 
-        df_list.append(df)
+    return pd.concat(df_list, ignore_index=True)
 
-final_df = pd.concat(df_list, ignore_index=True)
+final_df = load_data(folder_path)
 
 # Allignment of Date column so it would be "dd Month yyyy"
-final_df['Date'] = pd.to_datetime(final_df['Date'], errors='coerce').dt.strftime('%d %B %Y')
+final_df['Date_dt'] = pd.to_datetime(final_df['Date'], errors='coerce')
+final_df['Date'] = final_df['Date_dt'].dt.strftime('%d %B %Y')
 
 # Filter data for sidebar options
 areas = final_df['Area'].unique().tolist()
 clusters = final_df['Cluster'].unique().tolist()
 well_names = final_df['Well Name'].unique().tolist()
-types = final_df['Type'].unique().tolist()
+types = final_df['Type'].dropna().unique().tolist()
 
 # Sidebar options for filtering
 selected_area = st.sidebar.multiselect("Select Area", options=areas, default=areas)
@@ -88,7 +91,7 @@ def convert_df_to_excel(df):
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Filtered Data')
-        writer.save()
+        
     processed_data = output.getvalue()
     return processed_data
 
