@@ -6,7 +6,6 @@ from matplotlib import cm
 import streamlit as st
 from PIL import Image
 import os
-import xlsxwriter
 
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
@@ -89,7 +88,7 @@ st.dataframe(filtered_df)
 def convert_df_to_excel(df):
     from io import BytesIO
     output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(output) as writer:
         df.to_excel(writer, index=False, sheet_name='Filtered Data')
         
     processed_data = output.getvalue()
