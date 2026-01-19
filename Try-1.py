@@ -16,7 +16,7 @@ st.markdown("""
 
 /* ===== PGE BRAND THEME ===== */
 :root {
-    --pge-green: #20C202;
+    --pge-green: #42F222;
     --pge-green-dark: #004D3A;
     --pge-accent: #A5D6A7;
 }
