@@ -9,6 +9,37 @@ import os
 
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
+
+st.markdown("""
+<style>
+/* Download button animation */
+div.stDownloadButton > button {
+    background-color: #2E7D32;
+    color: white;
+    padding: 0.6em 1.4em;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    animation: pulse 2s infinite;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Hover effect */
+div.stDownloadButton > button:hover {
+    background-color: #1B5E20;
+    transform: scale(1.05);
+    animation: none;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.6); }
+    70% { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("Well History Data Compilation")
 if os.path.exists('Logo PGE Panjang 1.jpg'):
     st.image('Logo PGE Panjang 1.jpg')
@@ -99,9 +130,19 @@ def convert_df_to_excel(df):
 
 excel_data = convert_df_to_excel(filtered_df)
 
-st.download_button(
-    label="Download data as Excel",
+st.markdown("### 📤 Export Filtered Well History Data")
+
+clicked = st.download_button(
+    label="📥 Download Excel",
     data=excel_data,
-    file_name='filtered_well_history_data.xlsx',
-    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    file_name="filtered_well_history_data.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+if clicked:
+    st.success("✅ Download started successfully!")
+
+st.caption(
+    f"📄 {len(filtered_df)} rows exported | "
+    f"🕒 Generated on {pd.Timestamp.now().strftime('%d %B %Y %H:%M')}"
 )
