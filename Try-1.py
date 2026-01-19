@@ -81,6 +81,9 @@ filtered_df = final_df[
     (final_df['Type'].isin(selected_type))
 ]
 
+# Removing the temporary Date_dt column
+filtered_df = filtered_df.drop(columns=['Date_dt'])
+
 #>>>>>>>>>>>> Showing Data <<<<<<<<<<<<#
 st.dataframe(filtered_df)
 
