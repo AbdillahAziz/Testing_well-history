@@ -6,6 +6,7 @@ from matplotlib import cm
 import streamlit as st
 from PIL import Image
 import os
+import xlsxwriter
 
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
