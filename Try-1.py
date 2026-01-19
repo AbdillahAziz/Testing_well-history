@@ -54,8 +54,8 @@ for file_name in os.listdir(folder_path):
 
 final_df = pd.concat(df_list, ignore_index=True)
 
-# Allignment of Date column so it would be "dd mm yyyy"
-final_df['Date'] = pd.to_datetime(final_df['Date'], errors='coerce').dt.strftime('%d %m %Y')
+# Allignment of Date column so it would be "dd Month yyyy"
+final_df['Date'] = pd.to_datetime(final_df['Date'], errors='coerce').dt.strftime('%d %B %Y')
 
 # Filter data for sidebar options
 areas = final_df['Area'].unique().tolist()
