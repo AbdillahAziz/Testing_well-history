@@ -2,5 +2,6 @@ streamlit
 pandas
 numpy
 openpyxl
+xlsxwriter
 
 matplotlib
