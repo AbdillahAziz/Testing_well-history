@@ -81,3 +81,21 @@ filtered_df = final_df[
 #>>>>>>>>>>>> Showing Data <<<<<<<<<<<<#
 st.dataframe(filtered_df)
 
+# Option to download the filtered data as Excel
+def convert_df_to_excel(df):
+    from io import BytesIO
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Filtered Data')
+        writer.save()
+    processed_data = output.getvalue()
+    return processed_data
+
+excel_data = convert_df_to_excel(filtered_df)
+
+st.download_button(
+    label="Download data as Excel",
+    data=excel_data,
+    file_name='filtered_well_history_data.xlsx',
+    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+)
