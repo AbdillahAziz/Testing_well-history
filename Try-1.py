@@ -10,7 +10,7 @@ import os
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 st.set_page_config(layout="wide")  # this needs to be the first Streamlit command called
 st.title("Well History Data Compilation")
-st.image('Logo PGE Panjang.jpg', width=200)
+st.image('Logo PGE Panjang.jpg')
 st.write("""This page contain the compilation of well history data from various wells in the area. You can filter the data based on Area, Cluster, and Well Name using the sidebar options.""")
 #>>>>>>>>>>>> title <<<<<<<<<<<<#
 
@@ -53,6 +53,9 @@ for file_name in os.listdir(folder_path):
         df_list.append(df)
 
 final_df = pd.concat(df_list, ignore_index=True)
+
+# Allignment of Date column
+final_df['Date'] = pd.to_datetime(final_df['Date'], errors='coerce')
 
 # Filter data for sidebar options
 areas = final_df['Area'].unique().tolist()
