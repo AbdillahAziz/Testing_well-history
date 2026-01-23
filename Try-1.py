@@ -69,8 +69,7 @@ if os.path.exists('Logo PGE.png'):
 
 st.sidebar.title("Pengaturan")
 st.sidebar.subheader("Pengaturan konfigurasi tampilan")
-
-#Test
+#>>>>>>>>>>>> sidebar <<<<<<<<<<<<#
 
 #>>>>>>>>>>>> Load Data <<<<<<<<<<<<#
 # Load Excel
@@ -109,6 +108,9 @@ final_df = load_data(folder_path)
 # Allignment of Date column so it would be "dd Month yyyy"
 final_df['Date_dt'] = pd.to_datetime(final_df['Date'], errors='coerce')
 final_df['Date'] = final_df['Date_dt'].dt.strftime('%d %B %Y')
+
+# Fill data NaN with "-" for better display
+final_df = final_df.fillna("-")
 
 # Filter data for sidebar options
 areas = final_df['Area'].unique().tolist()
